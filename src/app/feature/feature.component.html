@@ -48,11 +48,13 @@
           </div>
 
         </div>
-
+        <div *ngIf="errorMsg" class="error-msg">
+          {{ errorMsg }}
+        </div>
         <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
-          <button mat-raised-button color="accent" [routerLink]="['/featuredetails']">Get</button>
-          <button type="button" mat-raised-button [routerLink]="['../']">Cancel</button>
-          <button mat-raised-button color="primary" [routerLink]="['/featuredetails']" (click)="submitFeature()">Submit</button>
+          <button mat-raised-button color="accent" >Get</button>
+          <button type="button" mat-raised-button >Cancel</button>
+          <button mat-raised-button color="primary"  (click)="submitFeature()">Submit</button>
         </mat-card-actions>
 
     </form>

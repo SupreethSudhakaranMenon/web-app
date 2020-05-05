@@ -16,6 +16,8 @@ import { element } from "protractor";
 export class ConfigurationComponent implements OnInit {
   productData = [];
 
+  checkweightage = false;
+
   categoryData = ["Individual", "Organisation", "Country", "CreditHistory", "Loan"];
 
   featureData = [];
@@ -40,10 +42,10 @@ export class ConfigurationComponent implements OnInit {
   maxRed = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
   public configurationObj = {
-    feature: '',
-    category: '',
-    product: '',
-    weightage: '',
+    feature: "",
+    category: "",
+    product: "",
+    weightage: "",
     colour1: "Green",
     greenmin: 0,
     greenmax: 0,
@@ -55,23 +57,24 @@ export class ConfigurationComponent implements OnInit {
     colour3: "Red",
     redmin: 0,
     redmax: 0,
-    id: '',
+    id: "",
 
-    greenminerror: 'Error: This is req field or max < min',
-    greenmaxerror: 'Error: This is req field or max < min',
-    amberminerror: 'Error: This is req field or max < min',
-    ambermaxerror: 'Error: This is req field or max < min',
-    redminerror: 'Error: This is req field or max < min',
-    redmaxerror: 'Error: This is req field or max < min',
+    greenminerror: "Error: This is req field or max < min",
+    greenmaxerror: "Error: This is req field or max < min",
+    amberminerror: "Error: This is req field or max < min",
+    ambermaxerror: "Error: This is req field or max < min",
+    redminerror: "Error: This is req field or max < min",
+    redmaxerror: "Error: This is req field or max < min",
   };
-  greenFormControl = new FormControl('', Validators.required);
-  greenMaxFormControl = new FormControl('', Validators.required);
+  greenFormControl = new FormControl("", Validators.required);
+  greenMaxFormControl = new FormControl("", Validators.required);
 
-  amberFormControl = new FormControl('', Validators.required);
-  amberMaxFormControl = new FormControl('', Validators.required);
+  amberFormControl = new FormControl("", Validators.required);
+  amberMaxFormControl = new FormControl("", Validators.required);
 
-  redFormControl = new FormControl('', Validators.required);
-  redMaxFormControl = new FormControl('', Validators.required);
+  redFormControl = new FormControl("", Validators.required);
+  redMaxFormControl = new FormControl("", Validators.required);
+  errorMsg: string;
 
   constructor(private _configService: ConfigService, private router: Router, private route: ActivatedRoute) {}
 
@@ -98,59 +101,82 @@ export class ConfigurationComponent implements OnInit {
   checkGreenMin() {
     this.greenFormControl.setErrors(null);
     this.greenMaxFormControl.setErrors(null);
-    if(!this.configurationObj.greenmax){
+    if (!this.configurationObj.greenmax) {
       this.greenFormControl.setErrors(null);
       return true;
-    }else{
+    } else {
       let cond = true;
-      if(this.configurationObj.greenmax < this.configurationObj.greenmin){
+      if (this.configurationObj.greenmax < this.configurationObj.greenmin) {
         cond = false;
         this.greenFormControl.setErrors({
-          notMatched: true
-       });
-      }
-      else{
+          notMatched: true,
+        });
+      } else {
         this.maxGreen = this.minGreen;
         this.greenFormControl.setErrors(null);
       }
       return cond;
     }
-}
-public readallproducts(){
-  const successcallback = (data) => {
-    for(let pro of data){
-      this.productData.push(pro.name);
-    }
-  };
-  this._configService.readJSONfile(successcallback);
-}
-checkGreenMax() {
-  this.greenFormControl.setErrors(null);
-  this.greenMaxFormControl.setErrors(null);
-  if(!this.configurationObj.greenmin){
-    this.greenMaxFormControl.setErrors(null);
-    return true;
-  }else{
-    let cond = true;
-    if(this.configurationObj.greenmax < this.configurationObj.greenmin){
-      console.log('in max');
-      cond = false;
-      this.greenMaxFormControl.setErrors({
-        notMatched: true
-     });
-    }
-    else{
-      this.greenMaxFormControl.setErrors(null);
-    }
-    return cond;
   }
-}
-  public submitFeature() {
-    // console.log(JSON.stringify(this.configurationObj));
+  public readallproducts() {
     const successcallback = (data) => {
-      this.router.navigate(["configurationdetails"]);
+      for (let pro of data) {
+        this.productData.push(pro.name);
+      }
     };
-    this._configService.saveConfig(this.configurationObj, successcallback);
+    this._configService.readJSONfile(successcallback);
+  }
+  checkGreenMax() {
+    this.greenFormControl.setErrors(null);
+    this.greenMaxFormControl.setErrors(null);
+    if (!this.configurationObj.greenmin) {
+      this.greenMaxFormControl.setErrors(null);
+      return true;
+    } else {
+      let cond = true;
+      if (this.configurationObj.greenmax < this.configurationObj.greenmin) {
+        console.log("in max");
+        cond = false;
+        this.greenMaxFormControl.setErrors({
+          notMatched: true,
+        });
+      } else {
+        this.greenMaxFormControl.setErrors(null);
+      }
+      return cond;
+    }
+  }
+  public submitFeature() {
+    console.log(Number(this.configurationObj.weightage));
+    console.log(isNaN(Number(this.configurationObj.weightage)));
+    this.checkweightage = false;
+    this.errorMsg = "";
+    if (
+      Number(this.configurationObj.weightage) < 0 ||
+      Number(this.configurationObj.weightage) > 1 ||
+      isNaN(Number(this.configurationObj.weightage))
+    ) {
+      this.checkweightage = true;
+    }
+    if (
+      this.configurationObj.ambermax &&
+      this.configurationObj.ambermin &&
+      this.configurationObj.redmax &&
+      this.configurationObj.redmin &&
+      this.configurationObj.greenmax &&
+      this.configurationObj.greenmin &&
+      this.configurationObj.category &&
+      this.configurationObj.feature &&
+      this.configurationObj.product
+    ) {
+    } else {
+      this.errorMsg = "All Fields are mandatory";
+    }
+
+    // const successcallback = (data) => {
+    //   this.router.navigate(["configurationdetails"]);
+    // };
+    // this._configService.saveConfig(this.configurationObj, successcallback);
   }
   public getFeatureCategory() {
     const successcallback = (data) => {
@@ -185,8 +211,7 @@ checkGreenMax() {
       // this.populateGreen();
     };
     await this._configService.getOneFeature(id, successcallback);
-//  this.populateGreen();
-
+    //  this.populateGreen();
   }
 
   public onFeatureSelection() {
@@ -194,23 +219,22 @@ checkGreenMax() {
     // this.featureData.forEach(x-> x.feature===this.configurationObj.feature)
     this.configurationObj.category = y[0].category;
   }
-async populateGreen(){
-  console.log(JSON.stringify(this.configurationObj));
-  // this.maxGreen = new Set([]);
-  console.log("min"+ this.configurationObj.greenmin);
-  console.log("min"+ this.configurationObj.greenmax);
-    let i = this.configurationObj.greenmin ;
-    for(; i<= this.configurationObj.greenmax;i++){
+  async populateGreen() {
+    console.log(JSON.stringify(this.configurationObj));
+    // this.maxGreen = new Set([]);
+    console.log("min" + this.configurationObj.greenmin);
+    console.log("min" + this.configurationObj.greenmax);
+    let i = this.configurationObj.greenmin;
+    for (; i <= this.configurationObj.greenmax; i++) {
       this.maxGreen.add(i);
-  console.log("inside for loop"+i);
-
+      console.log("inside for loop" + i);
     }
-  console.log("Greenmax" + JSON.stringify(this.maxGreen));
-  this.populateAmberMax();
-  this.populateRedMax();
-}
+    console.log("Greenmax" + JSON.stringify(this.maxGreen));
+    this.populateAmberMax();
+    this.populateRedMax();
+  }
 
-/**
+  /**
   populateGreenMin() {
     if (this.minAmber.length === 0 && this.minRed.length === 0) {
       this.minGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -273,37 +297,36 @@ async populateGreen(){
 
   populateAmberMax() {
     console.log("populating amber" + this.maxAmber);
-      this.maxAmber = new Set([]);
-      console.log(this.maxGreen.size > 0);
-      console.log(this.configurationObj.greenmax);
-      console.log(this.maxGreen.size > 0);
-      if (this.maxGreen.size > 0 && this.configurationObj.greenmax ) {
-        let i = this.configurationObj.greenmax + 1;
-        console.log("i"+ i);
-        console.log("bool"+ (i <= 10));
-        for(; i<= 10;i++){
-          console.log("i"+ i);
-          this.maxAmber.add(i);
-
-        }
+    this.maxAmber = new Set([]);
+    console.log(this.maxGreen.size > 0);
+    console.log(this.configurationObj.greenmax);
+    console.log(this.maxGreen.size > 0);
+    if (this.maxGreen.size > 0 && this.configurationObj.greenmax) {
+      let i = this.configurationObj.greenmax + 1;
+      console.log("i" + i);
+      console.log("bool" + (i <= 10));
+      for (; i <= 10; i++) {
+        console.log("i" + i);
+        this.maxAmber.add(i);
       }
-      console.log(this.maxAmber);
-      this.minAmber = this.maxAmber;
-      if (!this.configurationObj.redmax && !this.configurationObj.redmin) {
-        this.maxRed = this.minRed = this.minAmber;
-      }
+    }
+    console.log(this.maxAmber);
+    this.minAmber = this.maxAmber;
+    if (!this.configurationObj.redmax && !this.configurationObj.redmin) {
+      this.maxRed = this.minRed = this.minAmber;
+    }
   }
 
   populateRedMax() {
     console.log("populating red" + this.maxRed);
     this.maxRed = new Set([]);
     if (this.maxAmber.size > 0 && this.configurationObj.ambermax && this.configurationObj.ambermin) {
-      for(let i = this.configurationObj.ambermax + 1; i<= 10;i++){
+      for (let i = this.configurationObj.ambermax + 1; i <= 10; i++) {
         this.maxRed.add(i);
       }
     }
     this.minRed = this.maxRed;
-}
+  }
   // populateRedMin() {
   //   if (this.minAmber.length === 0 && this.minGreen.length === 0) {
   //     this.minGreen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -363,7 +386,7 @@ async populateGreen(){
   }
   onGreenMaxSelection() {
     this.maxGreen = new Set([]);
-    for(let i = this.configurationObj.greenmin ; i<= this.configurationObj.greenmax;i++){
+    for (let i = this.configurationObj.greenmin; i <= this.configurationObj.greenmax; i++) {
       this.maxGreen.add(i);
     }
     console.log(this.maxGreen);

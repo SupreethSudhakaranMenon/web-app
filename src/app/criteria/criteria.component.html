@@ -31,11 +31,11 @@
           </mat-form-field>
 
         </div>
-        <div>
+        <!-- <div>
           <span class="error-width">This field is mandatory feature</span>
           <span class="error-width"></span>
           <span class="error-width">This field is mandatory product</span>
-        </div>
+        </div> -->
 
 
         <div>
@@ -62,7 +62,7 @@
             <span fxFlex="48%" fxHide.lt-md></span>
           </div>
           <div>
-            <span>This field is mandatory</span>
+            <!-- <span>This field is mandatory</span> -->
 
           </div>
 
@@ -81,17 +81,11 @@
         <div class="columnssm4">Criteria</div>
         <div class="columnssm4">Score</div>
       </div>
-      <!-- <div class="row rowstyle">
-              <div class="columnssm4">Criteria</div>
-              <div class="col-sm-4">Score</div>
-            </div> -->
+
       <div class="row" *ngFor="let sc of criteriaObject.scoreCriteria; let i = index">
         <div>
           <mat-form-field>
             <input matInput [(ngModel)]="sc.criteria" name="criteria{{i}}" id="criteria{{i}}" disabled="false">
-            <!-- <div *ngIf="sc.errorflag">
-                  Please enter a valid email address
-                </div> -->
           </mat-form-field>
 
           <mat-form-field>
@@ -106,10 +100,13 @@
       <div class="row">
         <button mat-raised-button (click)="addRow()"> Add Row </button>
       </div>
+      <div *ngIf="errorFlag" class="errormsg">
+         All fields are mandatory
+      </div>
       <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
         <button mat-raised-button color="accent" [routerLink]="['/criteriadetails']">Get</button>
         <button type="button" mat-raised-button [routerLink]="['../']">Cancel</button>
-        <button mat-raised-button color="primary" [routerLink]="['/criteriadetails']" (click)="submitCriteria()">Submit</button>
+        <button mat-raised-button color="primary" (click)="submitCriteria()">Submit</button>
       </mat-card-actions>
 
     </form>

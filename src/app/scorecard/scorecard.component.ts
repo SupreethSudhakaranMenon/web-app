@@ -14,17 +14,23 @@ import { Router, ActivatedRoute } from "@angular/router";
 export class ScorecardComponent implements OnInit {
   model = ["Criteria", "Statistical", "Machine Learning"];
 
-  displayedColumns: string[] = ["Category", "Feature", "Score"];
+  displayedColumns: string[] = ["Category", "Feature", "Score", "Color"];
   public dataSource = [];
   columnsToDisplay: string[] = this.displayedColumns.slice();
 
-  public scorecardObj ={
-      age: [],
-      ageweitage: 0,
-      gender: [],
-      genderweightage: 0
+  public scorecardObj = {
+    age: [],
+    ageweitage: 0,
+    gender: [],
+    genderweightage: 0,
   };
-
+  errorFlag = false;
+  colorgreen = false;
+  scoregreen = '';
+  coloramber = false;
+  scoreamber = '';
+  colorred = false;
+  scorered = '';
   // dataTable: [];
   loanId = "";
   loanValues = [];
@@ -49,58 +55,65 @@ export class ScorecardComponent implements OnInit {
   }
 
   public getClientDetails() {
-    let clientId = null;
+    this.errorFlag = false;
+    this.colorgreen = false;
+    this.coloramber = false;
+    this.colorred = false;
+this.colorgreen = true;
+    if (!this.loanId) {
+      this.errorFlag = true;
+    } else {
+      let clientId = null;
 
-    for (let loan of this.loanValues) {
-      if (loan.id === +this.loanId) {
-        clientId = loan.clientId;
-        break;
+      for (let loan of this.loanValues) {
+        if (loan.id === +this.loanId) {
+          clientId = loan.clientId;
+          break;
+        }
+      }
+      if (clientId) {
+        const successcallback = (data) => {
+          let dob = data["dateOfBirth"];
+          let gender = data["gender"];
+
+          console.log(dob);
+          console.log(gender);
+          let age = 0;
+          let gen = "";
+          if (dob) {
+            age = new Date().getFullYear() - dob[0];
+          }
+          if (gender) {
+            gen = gender["name"].toUpperCase();
+          }
+          const successcallbackGen = (datagen) => {
+            let res = [];
+            let totalScore = Number(datagen["ageScore"]) + Number(datagen["genderScore"]);
+            res.push({
+              Category: "Individual",
+              Feature: " Age",
+              Score: datagen["ageScore"],
+              Color: datagen["ageColor"]
+            });
+            res.push({
+              Category: "Individual",
+              Feature: " Gender",
+              Score: datagen["genderScore"],
+              Color: datagen["genderColor"]
+            });
+            this.dataSource = res;
+          };
+          this._scoreCardService.getAllScore(successcallbackGen, age, gen);
+        };
+        this._scoreCardService.getClientDetails(successcallback, clientId);
       }
     }
-    if (clientId) {
-      const successcallback = (data) => {
-        let dob = data["dateOfBirth"];
-        let gender = data["gender"];
-
-        console.log(dob);
-        console.log(gender);
-        let age =0;
-        let gen = '';
-        if(dob){
-          age = new Date().getFullYear() - dob[0];
-        }
-        if(gender){
-          gen = gender['name'].toUpperCase();
-        }
-        const successcallbackGen = (datagen) => {
-          console.log(datagen);
-          // const dx = this.dataTable;
-          let res = []
-
-
-          res.push({
-            Category: "Individual",
-            Feature: " Age",
-            Score: datagen["ageScore"]
-          });
-          res.push({
-            Category: "Individual",
-            Feature: " Gender",
-            Score: datagen["genderScore"]
-          });
-          this.dataSource = res;
-        };
-        this._scoreCardService.getAllScore(successcallbackGen, age,gen);
-      };
-      this._scoreCardService.getClientDetails(successcallback, clientId);
-    }
   }
-
 }
 
 export interface PeriodicElement {
   Category: string;
   Feature: string;
   Score: string;
+  Color: string;
 }
-
